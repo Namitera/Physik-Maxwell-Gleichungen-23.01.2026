@@ -1,0 +1,1 @@
+# Physik-Maxwell-Gleichungen-16.01.2026
