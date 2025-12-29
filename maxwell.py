@@ -1,34 +1,6 @@
 from manim import *
 
 
-class T(Scene):
-    def construct(self):
-        max_x = 6
-        max_y = 6
-        step = 0.5
-        e = 0.001
-        scalar = 1
-        
-        # func1 = lambda pos: 0.3*pos[0] * RIGHT + 0.3*pos[1] * UP
-        # func1 = lambda pos: -1*pos[1]/(np.sqrt(pos[0]**2 + pos[1]**2)) * RIGHT + 1*pos[0]/(np.sqrt(pos[0]**2 + pos[1]**2)) * UP
-        # func1 = lambda pos: -1*pos[1] * RIGHT + 1*pos[0] * UP
-        # func1 = lambda pos: 3*pos[0]*pos[1]/((pos[0]**2 + pos[1]**2)**2 + e) * RIGHT + (2*pos[1]**2 - pos[0]**2)/((pos[0]**2 + pos[1]**2)**2 + e) * UP
-        func1 = lambda pos: scalar*((pos[1]-1)*RIGHT + -pos[0]*UP)/(pos[0]**2+(pos[1]-1)**2+e) + scalar*((-(pos[1]+1))*RIGHT + pos[0]*UP)/(pos[0]**2+(-(pos[1]+1))**2+e)
-
-        # vector_field = ArrowVectorField(func1, x_range=[-max_x, max_x, step], y_range=[-max_y, max_y, step])
-        
-        stream = StreamLines(func1, stroke_width=2, max_anchors_per_line=300, virtual_time=50, n_repeats=5)
-
-        self.add(NumberPlane())
-        # self.add(vector_field)
-        self.add(stream)
-        stream.start_animation(warm_up=False, flow_speed=2.5)
-        self.wait(5)
-
-
-
-
-
 class Overview(Scene):
     def construct(self):   
 
@@ -1182,10 +1154,6 @@ class FluxIntegral(ThreeDScene):
 
 
 
-class SurfaceIntegral(Scene):
-    def construct(self):
-        1
-
 class GaussLawIntuition(Scene):
     def construct(self):
 
@@ -1201,63 +1169,325 @@ class GaussLawIntuition(Scene):
 
 
 
-class GaussLawDerivation(Scene):
+
+
+class Gauss(ThreeDScene):
     def construct(self):
 
-        numberplane = NumberPlane().set_opacity(0.2)
-        circle = Circle(radius=3.5, color=BLUE)
-        arcphi = Arc()
-        phi = MathTex(r"\varphi").set_color(YELLOW)
-        phi2 = MathTex(r"\varphi").set_color(YELLOW)
-        dphi = MathTex(r"d\varphi").set_color(YELLOW)
-    
-        r = MathTex(r"r").set_color(GREEN)
-        r_line1 = Line(start=[0,0,0], end=[0,0,0])
-        r_line2 = Line(start=[0,0,0], end=[0,0,0])
-        point = Circle().set_opacity(0)
+        #charge
+        charge = Dot3D(color=RED).scale(2)
 
-        phi_angle = ValueTracker(0)
-        radius = ValueTracker(3.5)
+        self.move_camera(phi=60*DEGREES, zoom=3)
+        self.begin_ambient_camera_rotation(rate=0.5)
 
-        circle.add_updater(lambda mob: mob.become(Circle(radius=radius.get_value(), color=BLUE).move_to(point)))
-        phi.add_updater(lambda mob: mob.move_to([2*np.cos(0.5*phi_angle.get_value()+PI/2) + circle.get_x(), 2*np.sin(0.5*phi_angle.get_value()+PI/2) + circle.get_y() ,0]))
-        phi2.add_updater(lambda mob: mob.move_to([2*np.cos(0.5*phi_angle.get_value()+PI/2) + circle.get_x(), 2*np.sin(0.5*phi_angle.get_value()+PI/2) + circle.get_y() ,0]))
-        dphi.add_updater(lambda mob: mob.move_to([2*np.cos(0.5*phi_angle.get_value()+PI/2) + circle.get_x(), 2*np.sin(0.5*phi_angle.get_value()+PI/2) + circle.get_y() ,0]))
-        arcphi.add_updater(lambda mob: mob.become(Arc(radius=radius.get_value(), start_angle=PI/2, angle=phi_angle.get_value(), arc_center=circle.get_center(), color=YELLOW)))
-        r_line1.add_updater(lambda mob: mob.become(Line(start=circle.get_center(), end=arcphi.get_end(), color=GREEN)))
-        r_line2.add_updater(lambda mob: mob.become(Line(start=circle.get_center(), end=arcphi.get_start(), color=GREEN)))
-        r.add_updater(lambda mob: mob.move_to(r_line1).shift(RIGHT*0.3+DOWN*0.3))
+        #vectors
+        a1 = Arrow3D(start=ORIGIN, end=[0,0,1],resolution=5,height=0.01,base_radius=0.04)
+        a2 = Arrow3D(start=ORIGIN, end=[0,0,-1],resolution=5,height=0.01,base_radius=0.04)
+        a3 = Arrow3D(start=ORIGIN, end=[1,0,0],resolution=5,height=0.01,base_radius=0.04)
+        a4 = Arrow3D(start=ORIGIN, end=[-1,0,0],resolution=5,height=0.01,base_radius=0.04)
+        a5 = Arrow3D(start=ORIGIN, end=[0,1,0],resolution=5,height=0.01,base_radius=0.04)
+        a6 = Arrow3D(start=ORIGIN, end=[0,-1,0],resolution=5,height=0.01,base_radius=0.04)
 
-        dlphi = MathTex(r"dL_{\varphi}=r\cdot d\varphi ")
-        dltheta = MathTex(r"dL_{\theta }=r\cdot sin(\varphi ) d\theta ")
-        dlA1= MathTex(r"dA=dL_{\varphi} \cdot dL_{\theta }")
-        dlA2= MathTex(r"dA=r\cdot d\varphi \cdot r\cdot sin(\varphi ) d\theta")
-        dlA= MathTex(r"dA=r^{2}sin(\varphi )d\varphi d\theta ")
+        arrows = VGroup(a1,a2,a3,a4,a5,a6).set_color(RED)
+        self.add(charge)
+        self.add(arrows)
+        self.wait(1)
 
-        self.add(numberplane, circle, arcphi, phi, r_line1, r_line2, r)
-        self.play(phi_angle.animate.set_value(-PI/2))
-        self.play(point.animate.shift(DOWN*3.5+LEFT*1), radius.animate.set_value(7))
-        self.play(ReplacementTransform(phi,dphi))
-        self.play(phi_angle.animate.set_value(-0.2))
-        self.play(point.animate.shift(DOWN*97+LEFT*1), radius.animate.set_value(100), phi_angle.animate.set_value(-0.05))
-        self.play(point.animate.shift(DOWN*800+LEFT*0), radius.animate.set_value(900), phi_angle.animate.set_value(-0.008))
-        self.play(point.animate.shift(UP*897+LEFT*0), radius.animate.set_value(7), phi_angle.animate.set_value(-PI/4))
+        #surface
+        sphere = Sphere(resolution=(24,12))
+
+        self.play(arrows.animate.scale(2))
+        self.play(Create(sphere))
+
+        #Law
+        law_tex = MathTex(r"\oint_{A}\vec{E}\cdot d\vec{A}").move_to([0,0,2])
+
+        self.add_fixed_orientation_mobjects(law_tex)
+        self.add_fixed_in_frame_mobjects(law_tex)
+        self.play(Write(law_tex))
         self.wait()
-        self.play(ReplacementTransform(dphi,phi2))
 
-        self.play(phi_angle.animate.set_value(-PI/2), radius.animate.set_value(3.5), point.animate.shift(DOWN*-3.5+LEFT*-2))
 
-        ellipse = Ellipse()
-        ellipse.add_updater(lambda mob: mob.become(Ellipse(width=2*radius.get_value()*np.sin(phi_angle.get_value()), height=0.5*radius.get_value()*np.sin(phi_angle.get_value()), color=GREEN).move_to([0,arcphi.get_end()[1],0])))
 
-        r2 = MathTex(r"r").set_color(YELLOW)
-        r2_line1 = Line(start=[0,0,0], end=[0,0,0])
-        r2_line1.add_updater(lambda mob: mob.become(Line(start=ellipse.get_center(), end=ellipse.get_right(), color=GREEN)))
-        r2.add_updater(lambda mob: mob.next_to(r2_line1, DOWN))
+class GaussLawDerivation(ThreeDScene):
+    def construct(self):
 
-        self.add(ellipse, r2, r2_line1)
-        self.remove(r,r_line1,r_line2)
-        self.play(phi_angle.animate.set_value(-PI/4))
-        self.play(phi_angle.animate.set_value(-3*PI/4))
-        self.play(phi_angle.animate.set_value(-PI/4))
-        self.play(Write(dltheta))
+        #setup
+        formula = MathTex(r"\oint_{A}",r"\vec{E}",r"\cdot",r"d\vec{A}")
+
+        core = Circle(radius=0.4,color=RED,fill_opacity=1)
+        corss1 = Rectangle(height=0.02,width=0.4,fill_opacity=1)
+        corss2 = Rectangle(height=0.4,width=0.02,fill_opacity=1)
+        proton = VGroup(core,corss1,corss2)
+        circle = Circle(radius=2.5,color=BLUE)
+
+        self.play(Write(formula))
+        self.play(formula.animate.to_corner(UL))
+        self.play(Create(proton))
+        self.play(Write(circle))
+
+        #sphere
+        sphere = Sphere().rotate(PI/4,axis=RIGHT).scale(2.5)
+        self.play(Create(sphere))
+        self.play(Rotate(sphere, PI, axis=UP))
+        self.play(sphere.animate.shift(-5.5*RIGHT+2*DOWN).scale(1/2.5))
+
+        #r is n 
+        da = MathTex(r"d",r"\vec{A}",r"=",r"\hat{n}",r"\cdot",r"A").shift(UP*3)
+        da[3].set_color(RED)
+        n_vec = Vector([1,0]).next_to(circle,RIGHT,buff=0).set_color(RED)
+        nhat = MathTex(r"\hat{n}").next_to(n_vec,UP).set_color(RED)
+
+        r_vec = Vector([2.1,0]).next_to(core,RIGHT,buff=0).set_color(YELLOW)
+        rhat = MathTex(r"\vec{r}").next_to(r_vec,UP).set_color(YELLOW)       
+        risn = MathTex(r"\hat{r}",r"=",r"\hat{n}").move_to([4,2,0])       
+        risn[0].set_color(YELLOW)
+        risn[2].set_color(RED)
+
+        self.play(ReplacementTransform(formula[3].copy(),da))
+        self.play(ReplacementTransform(da[3].copy(),nhat),GrowArrow(n_vec))
+        self.play(Write(rhat),GrowArrow(r_vec))
+
+        self.play(Write(risn))
+        self.play(Rotate(VGroup(nhat,rhat,n_vec,r_vec),2*PI,about_point=ORIGIN))
+
+        #reinsert
+        da2 = MathTex(r"d\vec{A}=",r"\hat{r}",r"\cdot A").shift(UP*3)
+        da2[1].set_color(YELLOW)
+
+        self.play(FadeOut(da),ReplacementTransform(risn,da2))
+        self.play(FadeOut(VGroup(circle,rhat,r_vec,nhat,n_vec)))
+
+        self.play(FadeOut(da2[0]),FadeOut(formula[3]))
+        self.play(formula[0:3].animate.next_to(da2[1],LEFT).shift(DOWN*0.07))
+
+        #constants
+        e_con = MathTex(r"E").shift(UP*1)
+        formula2 = MathTex(r"\oint_{A}",r"A").shift(UP*3)
+
+        self.play(FadeOut(proton))
+        self.play(VGroup(formula[1:3],da2[1]).animate.shift(DOWN*2))
+
+        self.play(ReplacementTransform(VGroup(formula[1:3],da2[1]), e_con))
+        self.play(e_con.animate.shift(UP*2))
+        self.play(e_con.animate.shift(LEFT*1), FadeOut(VGroup(formula,da2)), FadeIn(formula2))
+
+        #back to sphere
+        self.play(sphere.animate.move_to([0,-0.7,0]))
+        self.play(sphere.animate.scale(2.5))
+
+        #area
+        area = MathTex(r"A=",r"4\pi r^{2}").move_to([5,0,0])
+        area2 = MathTex(r"4\pi r^{2}").move_to(area[1])
+        self.play(Write(area))
+        self.play(area2.animate.move_to(formula2), FadeOut(formula2))
+
+        #coulomb
+        formula3 =  MathTex(r"\phi=E\cdot 4\pi r^{2}").shift(UP*3)
+        coulomb = MathTex(r"E=\frac{1}{4\pi \varepsilon_{0}} \cdot \frac{q}{r^{2}}").to_corner(UR)
+        solution = MathTex(r"\phi=\frac{q}{\varepsilon_{0}}").shift(UP*3)
+
+        self.play(FadeOut(VGroup(formula2,area2, e_con, area)), FadeIn(formula3))
+        self.play(Write(coulomb))
+        self.play(ReplacementTransform(formula3,solution))
+
+        #show flux
+        vecField1Func1 = lambda pos: pos[0]*RIGHT + pos[1]*UP
+        colors1 = [ORANGE,RED]
+        stream = StreamLines(vecField1Func1, stroke_width=2, max_anchors_per_line=50, virtual_time=50, n_repeats=1, colors=colors1, min_color_scheme_value=1,  max_color_scheme_value=6).set_z_index(-99)
+
+        self.play(FadeOut(coulomb))
+        self.add(stream)
+        stream.start_animation(warm_up=True, flow_speed=2)
+        self.wait(5)
+
+        #open sphere
+        sphere2 = Sphere(u_range=[0,PI], v_range=[PI/2,PI]).rotate(PI/4,axis=RIGHT).scale(2.5).move_to([0,-0.1,0])
+        sphere2.rotate(PI, axis=UP)
+        self.play(Create(sphere2), FadeOut(sphere), FadeIn(proton))
+
+        #change charge
+        core1 = Circle(radius=0.4,color=PURE_GREEN,fill_color=PURE_GREEN,fill_opacity=1)
+        corss3 = Rectangle(height=0.03,width=0.3,fill_opacity=1)
+        electron = VGroup(core1,corss3)
+
+        self.play(FadeOut(proton), FadeIn(electron))
+
+        stream.end_animation()
+
+        vecField1Func2 = lambda pos: -pos[0]*RIGHT + -pos[1]*UP
+        colors2 = [GREEN,PURE_GREEN]
+        stream2 = StreamLines(vecField1Func2, stroke_width=2, max_anchors_per_line=50, virtual_time=50, n_repeats=1, colors=colors2, min_color_scheme_value=1,  max_color_scheme_value=6).set_z_index(-99)
+        stream2.start_animation(warm_up=True, flow_speed=2)
+
+        self.wait(5)
+
+
+
+
+
+class GaussSurfaceIndependence(Scene):
+    def construct(self):
+
+        def vector_field(pos,q=1):
+            x, y, _ = pos
+            return np.array([
+                np.sin(q*(x+4.3)+q*(y+12.8)),
+                np.cos(q*(x+4.3)-q*(y+12.8)),
+                0
+            ])
+        def vector_field2(pos,q=1):
+            x, y, _ = pos
+            return q*np.array([
+                x+y,
+                y,
+                0
+            ])
+        
+        dt = 4
+
+        def flow_function(p):
+            return p + dt * vector_field(8*p,0.18)
+        def flow_function2(p):
+            return p + dt * vector_field2(p,1)
+
+        square = Circle(color=BLUE).set_z_index(-1)
+        square2 = Star(color=BLUE, n=10).set_z_index(-1)
+        square.set_fill(BLUE, opacity=0.4)
+        square2.set_fill(BLUE, opacity=0.4)
+
+        core = Circle(radius=0.4,color=RED,fill_opacity=1)
+        corss1 = Rectangle(height=0.02,width=0.4,fill_opacity=1)
+        corss2 = Rectangle(height=0.4,width=0.02,fill_opacity=1)
+        proton = VGroup(core,corss1,corss2)
+
+        #init
+        self.play(Write(square))
+        self.play(Write(proton))
+
+        #field stretch
+        func0 = lambda pos: pos[0]*RIGHT + pos[1]*UP
+        f0 = ArrowVectorField(func=func0,color=RED).set_opacity(0.7).set_z_index(-2)
+
+        self.play(Create(f0))
+        self.play(
+            square.animate.apply_function(flow_function),
+            run_time=17,
+            rate_func=linear
+        )
+
+        #2nd example
+        self.play(FadeOut(square))
+        self.play(Write(square2))
+        self.play(
+            square2.animate.apply_function(flow_function2),
+            run_time=17,
+            rate_func=linear
+        )
+
+
+
+
+
+class GaussSurfaceIndependence3D(ThreeDScene):
+    def construct(self):
+
+        def vector_field(pos,q=1):
+            x, y, z = pos
+            return np.array([
+                np.sin(q*(x+4.3)+q*(y+12.8)),
+                np.cos(q*(x+4.3)-q*(y+12.8)),
+                0.1*z
+            ])
+        def vector_field2(pos,q=1):
+            x, y, z = pos
+            return q*np.array([
+                x+y,
+                y,
+                -0.1*z
+            ])
+        
+        dt = 4
+
+        def flow_function(p):
+            return p + dt * vector_field(8*p,0.18)
+        def flow_function2(p):
+            return p + dt * vector_field2(p,1)
+
+        square = Sphere(color=BLUE)
+        square2 = Sphere(color=BLUE)
+        square.set_fill(BLUE, opacity=0.4)
+        square2.set_fill(BLUE, opacity=0.4)
+
+        core = Circle(radius=0.4,color=RED,fill_opacity=1)
+        corss1 = Rectangle(height=0.02,width=0.4,fill_opacity=1)
+        corss2 = Rectangle(height=0.4,width=0.02,fill_opacity=1)
+        proton = VGroup(core,corss1,corss2)
+
+        #init
+        self.play(Write(square))
+        self.play(Write(proton))
+        self.move_camera(phi=60*DEGREES,theta=-45*DEGREES)
+
+
+        #field stretch
+        func0 = lambda pos: pos[0]*RIGHT + pos[1]*UP
+        f0 = ArrowVectorField(func=func0,color=RED).set_opacity(0.7).set_z_index(-2)
+
+        self.begin_ambient_camera_rotation(rate=0.3)
+        self.play(Create(f0))
+        self.play(
+            square.animate.apply_function(flow_function),
+            run_time=17,
+            rate_func=linear
+        )
+
+        #2nd example
+        self.play(FadeOut(square))
+        self.play(Write(square2))
+        self.play(
+            square2.animate.apply_function(flow_function2),
+            run_time=17,
+            rate_func=linear
+        )
+
+
+
+
+
+class MagnetIntro(ThreeDScene):
+    def construct(self):
+        
+        func1 = lambda pos: vecField1(pos=pos)
+        def vecField1(pos):
+            e = 0.001
+            s = 0.2
+            x = pos[0]
+            y = pos[1]
+            normal1 = x**2 + (y-s)**2 + e
+            normal2 = x**2 + (y+s)**2 + e
+            field = [0,0]
+            field[0] = (y-s)/(normal1) - (y+s)/(normal2)
+            field[1] = (-x)/(normal1) + (x)/(normal2)
+            return field[0]*RIGHT + field[1]*UP
+        
+        vector_field = ArrowVectorField(func=func1,max_color_scheme_value=0.1,min_color_scheme_value=0.01)
+        stream = StreamLines(func1, stroke_width=2, max_anchors_per_line=300, virtual_time=50, n_repeats=1).set_z_index(-1)
+
+        north_pole = Rectangle(width=1,height=0.5,color=BLUE,fill_opacity=1).shift(LEFT*0.5)
+        south_pole = Rectangle(width=1,height=0.5,color=RED,fill_opacity=1).shift(LEFT*-0.5)
+        north_pole_tex = MathTex(r"N").move_to(north_pole)
+        south_pole_tex = MathTex(r"S").move_to(south_pole)
+        magnet = VGroup(north_pole,south_pole,north_pole_tex,south_pole_tex).move_to([0,0,0.1]).set_z_index(1)
+
+        self.play(Write(magnet))
+        # self.add(vector_field)
+        # self.add(stream)
+        # stream.start_animation(warm_up=True, flow_speed=3)
+        # self.wait(3)
+        self.move_camera(frame_center=[0,0,3])
+        # self.wait(3)
+        # stream.end_animation()
+
+        stream2 = StreamLines(func1, stroke_width=2, max_anchors_per_line=300, virtual_time=50, n_repeats=1).set_z_index(-1)
+        self.add(stream2)
