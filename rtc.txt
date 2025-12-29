@@ -1,0 +1,82 @@
+Maxwells Equations
+1
+2
+3
+4
+
+Intergrals
+Lineintegrals
+Surfaceintegrals
+Vectors
+dotpruduct
+crossproduct
+gradient
+vector fields
+divergence
+flux/curl
+
+
+class Overview(Scene):
+
+class IngegralIntro(Scene):
+class IngegralTriangle(Scene):
+class IngegralFineRectangles(Scene):
+class IngegralExplanation(Scene):
+
+class VectorIntro(Scene):
+class VectorDotProductLabel(Scene):
+class VectorDotProduct(Scene):
+
+class VectorFieldIntro(Scene):
+class VectorFieldExamples1(Scene):
+class VectorFieldExamples2(Scene):
+
+class Divergence(Scene):
+
+class CurlIntro(Scene):
+class Curl3D(ThreeDScene):
+
+class Circulation(Scene):
+
+class Flux(Scene):
+class FluxIntegral(ThreeDScene):
+
+class GaussLawIntuition(Scene):
+class GaussLawDerivation(Scene):
+
+
+Overview 4 Laws
+2nd Law
+magnet intro
+vf show then explain it
+
+VectorIntro
+VectorFieldIntro
+VectorFieldExamples1
+Desmos Fields
+VectorFieldExamples2
+
+no monopoles
+Divergence
+nabla version div Form
+2nd law and end
+
+GausOverview
+div explain
+
+intro int form
+
+VectorDotProductLabel
+VectorDotProduct
+Flux
+
+IngegralIntro
+IngegralTriangle
+IngegralFineRectangles
+IngegralExplanation
+FluxIntegral
+
+GaussLawIntuition
+GaussLawDerivation
+GaussSurfaceIndependence
+
