@@ -1650,8 +1650,83 @@ class CurlIntro(Scene):
             field[1] = -x
             return field[0]*RIGHT + field[1]*UP
 
+        def curlFunc1(x,y):
+            return 2
+
+        def curlFunc2(x,y):
+            return -2
+
+        colors1 = [BLUE,GREEN,YELLOW,RED]
+        vecField1Func1 = lambda pos: vecField1(pos=pos)
+        vector_field1 = ArrowVectorField(vecField1Func1, max_color_scheme_value=8,min_color_scheme_value=1, colors=colors1).set_z_index(-1)
+
+        rot = Tex("Rotation").scale(2).to_edge(UP)
+        b1 = SurroundingRectangle(rot,color=BLACK,fill_color=BLACK,fill_opacity=0.7, stroke_opacity=0).move_to(rot)
+
+        stream = StreamLines(vecField1Func1, stroke_width=2, max_color_scheme_value=8)
+
+        #basic shwow
+        self.add(stream)
+        stream.start_animation(warm_up=True, flow_speed=1)
+        self.play(FadeIn(VGroup(b1,rot)))
+        self.wait(2)
+        self.play(FadeOut(stream))
+        stream.end_animation()
+        self.remove(stream)
+
+        #vector field and quantity
+        p1 = Dot().scale(0.5)
+        c1 = Circle(color=WHITE,radius=0.2).shift(UP)
+        rot_tex = MathTex(r"rot\vec{F}=")
+        rot_tex[0][3:5].set_color(YELLOW)
+        decnum = DecimalNumber(2)
+        s1 = SurroundingRectangle(rot_tex,color=BLACK, fill_color=BLACK ,fill_opacity=1, stroke_width=0)
+        s2 = SurroundingRectangle(decnum,color=BLACK, fill_color=BLACK ,fill_opacity=1, stroke_width=0)
+
+        p1.add_updater(lambda mob: mob.move_to(c1))
+        rot_tex.add_updater(lambda mob: mob.next_to(c1,UP))
+        s1.add_updater(lambda mob: mob.move_to(rot_tex))
+        s2.add_updater(lambda mob: mob.move_to(decnum))
+        decnum.add_updater(lambda mob: mob.set_value(curlFunc1(p1.get_x(),p1.get_y())).next_to(c1,UP).shift(RIGHT*1.5))
+
+        #setup
+        self.play(Create(vector_field1))
+        self.add(p1,s1,s2,decnum,c1,rot_tex)
+
+        #show uniform
+        self.play(c1.animate.move_to([0,0,0]))
+        self.play(c1.animate.move_to([-5,0,0]))
+        self.play(c1.animate.move_to([0,2,0]))
+        self.play(c1.animate.move_to([-3,-1,0]))
+        self.play(c1.animate.move_to([0,0,0]))
+
+        #old dir
+        vecField1Func2 = lambda pos: vecField2(pos=pos)
+        vector_field2 = ArrowVectorField(vecField1Func2, max_color_scheme_value=8,min_color_scheme_value=1, colors=colors1).set_z_index(-1)
+        stream2 = StreamLines(vecField1Func1, stroke_width=2, color=BLUE)
+        stream3 = StreamLines(vecField1Func2, stroke_width=2, color=BLUE)
+
+        self.add(stream2)
+        stream2.start_animation(warm_up=True, flow_speed=1)
+        self.wait()
+        self.play(FadeOut(stream2))
+
+        #dir change
+        self.play(vector_field1.animate.become(vector_field2))
+
+        decnum.clear_updaters()
+        decnum.add_updater(lambda mob: mob.set_value(curlFunc2(p1.get_x(),p1.get_y())).next_to(c1,UP).shift(RIGHT*1.5))
+
+        self.add(stream3)
+        stream3.start_animation(warm_up=True, flow_speed=1)
+        self.wait()
+        self.play(FadeOut(stream3))
+        self.remove(stream2,stream3)
+
+class CurlComplexExample(Scene):
+    def construct(self):
+
         def vecField3(pos):
-            e = 0.001
             x = pos[0]
             y = pos[1]
             field = [0,0]
@@ -1659,52 +1734,69 @@ class CurlIntro(Scene):
             field[1] = np.cos(0.5*(x-y))
             return field[0]*RIGHT + field[1]*UP
 
-        def curlFunc1(x,y):
+        def curlFunc3(x,y):
             xcomp = np.sin(0.5*x - 0.5*y)
             ycomp = np.cos(0.5*x + 0.5*y)
             return -0.5*(xcomp + ycomp)
 
-
         colors1 = [BLUE,GREEN,YELLOW,RED]
-        vecField1Func1 = lambda pos: vecField1(pos=pos)
-        vector_field1 = ArrowVectorField(vecField1Func1, max_color_scheme_value=8,min_color_scheme_value=1, colors=colors1).set_z_index(-1)
-        vector_field3 = ArrowVectorField(vecField1Func1, max_color_scheme_value=1.25,min_color_scheme_value=0.5, colors=colors1).set_z_index(-1)
-        self.add(vector_field1)
+        vecField1Func1 = lambda pos: vecField3(pos=pos)
+        vector_field1 = ArrowVectorField(vecField1Func1, max_color_scheme_value=1.4,min_color_scheme_value=0.5, colors=colors1).set_z_index(-1)
+        stream = StreamLines(vecField1Func1, stroke_width=2, max_color_scheme_value=1.4, min_color_scheme_value=0.5)
 
+        #basic shwow
+        self.add(stream)
+        stream.start_animation(warm_up=True, flow_speed=1)
+        self.wait(2)
+
+        #vector field and quantity
         p1 = Dot().scale(0.5)
-        c1 = Circle(color=WHITE,radius=0.2)
-        div_tex = MathTex(r"rot\vec{F}=")
-        div_tex[0][3:5].set_color(YELLOW)
-        decnum = DecimalNumber(0)
-        s1 = SurroundingRectangle(div_tex,color=BLACK, fill_color=BLACK ,fill_opacity=1, stroke_width=0)
+        c1 = Circle(color=WHITE,radius=0.2).shift(UP)
+        rot_tex = MathTex(r"rot\vec{F}=")
+        rot_tex[0][3:5].set_color(YELLOW)
+        decnum = DecimalNumber(2)
+        s1 = SurroundingRectangle(rot_tex,color=BLACK, fill_color=BLACK ,fill_opacity=1, stroke_width=0)
         s2 = SurroundingRectangle(decnum,color=BLACK, fill_color=BLACK ,fill_opacity=1, stroke_width=0)
 
-        c1.add_updater(lambda mob: mob.move_to(p1))
-        div_tex.add_updater(lambda mob: mob.next_to(p1,UP))
-        s1.add_updater(lambda mob: mob.move_to(div_tex))
+        p1.add_updater(lambda mob: mob.move_to(c1))
+        rot_tex.add_updater(lambda mob: mob.next_to(c1,UP))
+        s1.add_updater(lambda mob: mob.move_to(rot_tex))
         s2.add_updater(lambda mob: mob.move_to(decnum))
-        decnum.add_updater(lambda mob: mob.set_value(curlFunc1(p1.get_x(),p1.get_y())).next_to(p1,UP).shift(RIGHT*1.5))
+        decnum.add_updater(lambda mob: mob.set_value(curlFunc3(p1.get_x(),p1.get_y())).next_to(c1,UP).shift(RIGHT*1.5))
 
+        #setup
+        self.play(Create(vector_field1))
+        self.add(p1,s1,s2,decnum,c1,rot_tex)
+        self.wait()
 
-        self.add(p1,s1,s2,decnum,c1,div_tex)
-        self.play(p1.animate.move_to([-6,4,0]))
-        self.play(p1.animate.move_to([6,4,0]))
-        self.play(p1.animate.move_to([6,3,0]))
-        self.play(p1.animate.move_to([-6,3,0]))
-        self.play(p1.animate.move_to([-6,2,0]))
-        self.play(p1.animate.move_to([6,2,0]))
-        self.play(p1.animate.move_to([6,1,0]))
-        self.play(p1.animate.move_to([-6,1,0]))
-        self.play(p1.animate.move_to([-6,0,0]))
-        self.play(p1.animate.move_to([6,0,0]))
-        self.play(p1.animate.move_to([6,-1,0]))
-        self.play(p1.animate.move_to([-6,-1,0]))
-        self.play(p1.animate.move_to([-6,-2,0]))
-        self.play(p1.animate.move_to([6,-2,0]))
-        self.play(p1.animate.move_to([6,-3,0]))
-        self.play(p1.animate.move_to([-6,-3,0]))
-        self.play(p1.animate.move_to([-6,-4,0]))
-        self.play(p1.animate.move_to([6,-4,0]))
+        self.play(FadeOut(stream))
+        stream.end_animation()
+        self.remove(stream)
+
+        #show uniform
+        self.play(c1.animate.move_to([0,0,0]))
+        self.play(c1.animate.move_to([-5,0,0]))
+        self.play(c1.animate.move_to([0,2,0]))
+        self.play(c1.animate.move_to([-3,-1,0]))
+        self.play(c1.animate.move_to([0,0,0]))
+
+        #clear prepare twig
+        self.remove(p1,s1,s2,decnum,c1,rot_tex)
+        
+        branch1 = Rectangle(width=1.3, height=0.13, fill_color=GRAY_B, color=BLACK, fill_opacity=1)
+        branch2 = Rectangle(width=1.3, height=0.13, fill_color=WHITE, color=BLACK, fill_opacity=1).rotate(PI/2)
+        center = Circle(radius=0.13, fill_opacity=1, color=WHITE)
+        twig = VGroup(branch1,branch2,center)
+
+        self.play(Write(twig))
+
+        #show twig at spot
+        dt = 0.2
+        twig.add_updater(lambda mob: mob.rotate(dt*curlFunc3(twig.get_x(),twig.get_y())))
+        self.play(twig.animate.move_to([-4.5,-1.5,0]),rate_func=linear, run_time=4)
+        self.play(twig.animate.move_to([2,-1.5,0]),rate_func=linear, run_time=4)
+        self.play(twig.animate.move_to([1.5,1.6,0]),rate_func=linear, run_time=4)
+        self.play(twig.animate.move_to([-1.5,1.5,0]),rate_func=linear, run_time=4)
 
 class Curl3D(ThreeDScene):
     def construct(self):
@@ -1720,36 +1812,32 @@ class Curl3D(ThreeDScene):
 
         colors1 = [BLUE,GREEN,YELLOW,RED]
         vecField1Func1 = lambda pos: vecField1(pos=pos)
-        # vector_field1 = ArrowVectorField(vecField1Func1, max_color_scheme_value=6,min_color_scheme_value=1, colors=colors1,
-        #                                  x_range=[-6,6], y_range=[-6,6]).set_z_index(-1)
-        vector_field2 = ArrowVectorField(vecField1Func1, max_color_scheme_value=6,min_color_scheme_value=1, colors=colors1,
-                                         x_range=[-6,6,2], y_range=[-6,6,2]).set_z_index(-1)
+        vector_field1 = ArrowVectorField(vecField1Func1, max_color_scheme_value=6,min_color_scheme_value=1, colors=colors1,
+                                         x_range=[-6,6], y_range=[-6,6]).set_z_index(-1)
         
         axis = ThreeDAxes(x_range=[-2,2,1],y_range=[-2,2,1],z_range=[0,0.01,0.01],x_length=12,y_length=12,z_length=0.01,z_axis_config={"include_tip": False})
 
-        ihat = Arrow3D(start=ORIGIN,end=[2,0,0]).set_color(PURE_RED)
-        jhat = Arrow3D(start=ORIGIN,end=[0,2,0]).set_color(PURE_GREEN)
-        khat = Arrow3D(start=ORIGIN,end=[0,0,2]).set_color(PURE_BLUE).set_z_index(99)
+        ihat = Vector([2,0]).set_color(PURE_RED)
+        jhat = Vector([0,2]).set_color(PURE_GREEN)
+        khat = Vector([0,0,2]).set_color(PURE_BLUE).set_z_index(99)
 
-        ihat_tex = MathTex(r"\hat{i}").set_color(PURE_RED).move_to([1,-1,0]).rotate(PI/2,axis=OUT)
+        ihat_tex = MathTex(r"\hat{i}").set_color(PURE_RED).move_to([1,-1,0])
         jhat_tex = MathTex(r"\hat{j}").set_color(PURE_GREEN).move_to([1,1,0])
         khat_tex = MathTex(r"\hat{k}").set_color(PURE_BLUE).move_to([-1,0,1]).rotate(PI/2,axis=RIGHT).rotate(PI/2,axis=OUT)
 
-        # self.add()
-        self.add(axis,khat,ihat,jhat,khat_tex,ihat_tex,jhat_tex)
+        #intro khat
+        self.play(Write(VGroup(ihat_tex,jhat_tex)), GrowArrow(ihat), GrowArrow(jhat))
         self.move_camera(phi=60*DEGREES, theta=-45*DEGREES)
         self.move_camera(zoom=2.5,frame_center=[0,0,0.3])
+
+        self.play(Write(khat_tex), GrowArrow(khat), ihat_tex.animate.rotate(PI/2,axis=OUT))
         # self.play(ReplacementTransform(vector_field1,vector_field2))
 
 
         #streamlines
-        stream = StreamLines(vecField1Func1, stroke_width=2, max_anchors_per_line=50, virtual_time=50, n_repeats=1, colors=colors1, min_color_scheme_value=1,  max_color_scheme_value=6).set_z_index(-99)
+        # stream = StreamLines(vecField1Func1, stroke_width=2, max_anchors_per_line=50, virtual_time=50, n_repeats=1, colors=colors1, min_color_scheme_value=1,  max_color_scheme_value=6).set_z_index(-99)
 
-        self.play(vector_field2.animate.set_opacity(0.3), run_time=0.1)
-        self.add(stream)
-        stream.start_animation(warm_up=True, flow_speed=2)
-        self.wait(5)
-
-class Circulation(Scene):
-    def construct(self):
-        1
+        # self.play(vector_field1.animate.set_opacity(0.3), run_time=0.1)
+        # self.add(stream)
+        # stream.start_animation(warm_up=True, flow_speed=2)
+        # self.wait(5)
